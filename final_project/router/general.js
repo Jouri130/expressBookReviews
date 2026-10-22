@@ -1,23 +1,30 @@
 
 const express = require('express');
-let books = require('./booksdb.js');
-let isValid = require('./auth_users.js').isValid;
-let users = require('./auth_users.js').users;
+const books = require('./booksdb.js');
+const auth = require('./auth_users.js');
+
 const public_users = express.Router();
 
 public_users.post('/register', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password are required' });
+    return res.status(400).json({
+      message: 'Username and password are required'
+    });
   }
 
-  if (users[username]) {
-    return res.status(409).json({ message: 'User already exists' });
+  if (auth.isValid(username)) {
+    return res.status(409).json({
+      message: 'User already exists'
+    });
   }
 
-  users[username] = { password };
-  return res.status(201).json({ message: 'User successfully registered' });
+  auth.users.push({ username, password });
+
+  return res.status(201).json({
+    message: 'User successfully registered'
+  });
 });
 
 public_users.get('/', (req, res) => {
@@ -36,8 +43,10 @@ public_users.get('/isbn/:isbn', (req, res) => {
 
 public_users.get('/author/:author', (req, res) => {
   const author = req.params.author.toLowerCase();
+
   const result = Object.values(books).filter(
-    book => book.author && book.author.toLowerCase() === author
+    book => book.author &&
+      book.author.toLowerCase() === author
   );
 
   return res.status(200).json(result);
@@ -45,8 +54,10 @@ public_users.get('/author/:author', (req, res) => {
 
 public_users.get('/title/:title', (req, res) => {
   const title = req.params.title.toLowerCase();
+
   const result = Object.values(books).filter(
-    book => book.title && book.title.toLowerCase() === title
+    book => book.title &&
+      book.title.toLowerCase() === title
   );
 
   return res.status(200).json(result);
