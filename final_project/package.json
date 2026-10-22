@@ -1,19 +1,22 @@
-{
-  "name": "bookshop",
-  "version": "1.0.1",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.18.1",
-    "express-session": "^1.17.3",
-    "jsonwebtoken": "^8.5.1",
-    "nodemon": "^2.0.19"
+
+public_users.post('/register', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({
+      message: 'Username and password are required'
+    });
   }
-}
+
+  if (isValid(username)) {
+    return res.status(409).json({
+      message: 'User already exists'
+    });
+  }
+
+  users.push({ username, password });
+
+  return res.status(201).json({
+    message: 'User successfully registered'
+  });
+});
